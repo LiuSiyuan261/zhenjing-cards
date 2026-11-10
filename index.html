@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
-<title>雅思卡牌小样 v37 · 学/习各自管理卡牌</title>
+<title>雅思卡牌小样 v38 · 学/习各自管理卡牌</title>
 <style>
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
   html,body{margin:0;padding:0}
@@ -391,6 +391,11 @@
   .mcol u{font-size:9px}
   .mfoot2{bottom:20px;color:#9a865f;font-size:9.5px}
   .mhint{color:#8a8496}
+  /* ===== v38：iOS Safari 背面剔除失效兜底——翻面过半程后直接隐藏背向面 ===== */
+  .pcard .inner{-webkit-transform-style:preserve-3d}
+  .pcard .face.front,.pcard .face.back{transition:visibility 0s linear .27s}
+  .pcard.flipped .face.front{visibility:hidden}
+  .pcard:not(.flipped) .face.back{visibility:hidden}
 </style>
 </head>
 <body>
@@ -426,7 +431,7 @@ const AUDIO = {"e:abnormal": "data:audio/mpeg;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAA
 <script>
 
 /* 卡组全表（小样阶段只有核心词汇有卡，其余待补） */
-const DECK_GEO = { id:"deck_geo", name:"自然地理", book:"雅思词汇真经", css:"#275181", sub:"雅思词汇真经 · 自然地理（小样 · v37）", pal:["#275181", "#4198B4", "#AFDBE4", "#ABCCBB", "#E1741F", "#F0C24A", "#F2E3B9"], cards:[
+const DECK_GEO = { id:"deck_geo", name:"自然地理", book:"雅思词汇真经", css:"#275181", sub:"雅思词汇真经 · 自然地理（小样 · v38）", pal:["#275181", "#4198B4", "#AFDBE4", "#ABCCBB", "#E1741F", "#F0C24A", "#F2E3B9"], cards:[
     {"en": "magma", "pos": "n.", "ipa": "/ˈmægmə/", "zh": "岩浆", "src": "词汇真经 · 自然地理", "ex": "Some types of minerals are made when magma cools and solidifies.", "exZh": "有些类型的矿物是在岩浆冷却凝固的过程中形成的。", "note": "字根mag意为“揉，捏”，另外在希腊语中magma意为“浓厚的软膏”，后引申为岩浆，因其流动起来柔软如膏。"},
     {"en": "volcano", "pos": "n.", "ipa": "/vɑlˈkeɪnoʊ/", "zh": "火山", "src": "词汇真经 · 自然地理", "ex": "The volcano erupted and two small towns were buried under metres of hot ash,mud and bits of molten rock.", "exZh": "这次火山爆发将两座小镇掩埋于数米厚炽热的火山灰、泥浆和熔岩碎块之下。", "col": "an active/dormant/extinct volcano活/休眠/死火山sit on a volcano处境危险该词来自罗马神话中的火神武尔坎（Vulcan），他的妻子是鼎鼎大名的司爱情与美丽的女神维纳斯（Venus）。后来维纳斯爱上了战神帅哥，红杏出墙，还生下了私生子丘比特（Cupid）！武尔坎招惹不起强大的情敌，只好躲在地底下打铁，胸中的怒火、妒火和炉火同时喷发，于是火星和浓烟从山顶喷出，形成火山（volcano）爆发。e", "memo": "erupt i onn.喷发，爆发erupt 230344 ===== PDF p.16 =====", "note": "Hotlavaeruptedfromthecrust.从地壳中喷发出了滚烫的熔岩。"},
     {"en": "crust", "pos": "n.", "ipa": "/krəst/", "zh": "地壳；外壳", "src": "词汇真经 · 自然地理", "ex": "The crust on the snow was thick enough for us to walk on it.", "exZh": "雪上冻结的那层冰很厚，足以让我们在上面行走。"},
@@ -660,7 +665,7 @@ const DECK_GEO = { id:"deck_geo", name:"自然地理", book:"雅思词汇真经"
     {"en": "petroleum", "pos": "n.", "ipa": "/pəˈtroʊliəm/", "zh": "石油", "src": "词汇真经 · 自然地理", "ex": "Petroleum is an important natural resource.", "exZh": "石油是一种重要的自然资源。", "note": "字根petr指“石头”，如：petrology（岩石学）。记得surprise，amaze，astonish，astound这些表示“使惊奇”的词吗？要表达最高程度的“惊奇”，就用petrify（v.[使]石化；使吓呆）。Chapter1自然地理84930344=====PDFp.31=====小红书小红书号：42284930344=====PDFp.32=====Letlifebebeautifullikesummerflowersanddeathlikeautumnleaves.—RabindranathTagore使生如夏花之绚烂，死如秋叶之静美。一泰戈尔"},
     {"en": "trunk", "pos": "n.", "ipa": "/trəŋk/", "zh": "树干", "src": "词汇真经 · 自然地理", "note": "Chapter"}
   ] };
-const DECK_PLANT = { id:"deck_plant", name:"植物研究", book:"雅思词汇真经", css:"#5A6E5D", sub:"雅思词汇真经 · 植物研究（小样 · v37）", pal:["#5A6E5D", "#A19245", "#F2D057", "#F5EB9A", "#ECA056", "#98BDD3", "#E3E5DE"], cards:[
+const DECK_PLANT = { id:"deck_plant", name:"植物研究", book:"雅思词汇真经", css:"#5A6E5D", sub:"雅思词汇真经 · 植物研究（小样 · v38）", pal:["#5A6E5D", "#A19245", "#F2D057", "#F5EB9A", "#ECA056", "#98BDD3", "#E3E5DE"], cards:[
     {"en": "jungle", "pos": "n.", "ipa": "/ˈʤəŋgəl/", "zh": "（热带）丛林，密林", "src": "词汇真经 · 植物研究", "ex": "Tigers are found in the jungle of Asia.", "exZh": "在亚洲的丛林中有老虎。", "col": "in the jungle在丛林里"},
     {"en": "weed", "pos": "n.", "ipa": "/wid/", "zh": "杂草，野草v.除杂草", "src": "词汇真经 · 植物研究", "ex": "The garden is choked with weeds.", "exZh": "花园里杂草丛生。", "note": "===== PDF p.33 ====="},
     {"en": "photosynthesis", "pos": "n.", "ipa": "/ˌfoʊtoʊˈsɪnθəsɪs/", "zh": "光合作用", "src": "词汇真经 · 植物研究", "ex": "The algae capture the sun's energy by photosynthesis and store it inorganic molecules.", "exZh": "水藻通过光合作用获得太阳的能量，将它储存在有机分子中。", "memo": "photo（光）+synthesis（合成）→用光合成→光合作用。又如photograph（照片）：photo（光）+ graph（写．画）→用光来描绘。/rr'spais/ respire V.呼吸respiration n.呼吸respiratory adj.呼吸的", "note": "前缀photo表示“光（light）”，故该单词的结构是：Plantsrespireinthesamewayasanimals,takinginoxygenandgivingoutcarbondioxide.植物和动物的呼吸方式相同，即摄入氧气并释放二氧化碳。"},
@@ -924,8 +929,8 @@ const POS = [
   { x: 50, y: 65, s: 0.925, z: 0 }
 ];
 const DECK_META = {
-  geo:   { name:"自然地理", css:"#275181", sub:"雅思词汇真经 · 自然地理（小样 · v37）", pal:["#275181","#4198B4","#AFDBE4","#ABCCBB","#E1741F","#F0C24A","#F2E3B9"] },
-  plant: { name:"植物研究", css:"#5A6E5D", sub:"雅思词汇真经 · 植物研究（小样 · v37）", pal:["#5A6E5D","#A19245","#F2D057","#F5EB9A","#ECA056","#98BDD3","#E3E5DE"] }
+  geo:   { name:"自然地理", css:"#275181", sub:"雅思词汇真经 · 自然地理（小样 · v38）", pal:["#275181","#4198B4","#AFDBE4","#ABCCBB","#E1741F","#F0C24A","#F2E3B9"] },
+  plant: { name:"植物研究", css:"#5A6E5D", sub:"雅思词汇真经 · 植物研究（小样 · v38）", pal:["#5A6E5D","#A19245","#F2D057","#F5EB9A","#ECA056","#98BDD3","#E3E5DE"] }
 };
 const LS_KEY = "ielts.zhenjing.v23";
 function seedStore(){ return { geo: DECK_GEO.cards.slice(), plant: DECK_PLANT.cards.slice() }; }
