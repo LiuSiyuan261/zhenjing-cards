@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
-<title>雅思卡牌小样 v39 · 学/习各自管理卡牌</title>
+<title>雅思卡牌小样 v41 · 选组学习</title>
 <style>
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
   html,body{margin:0;padding:0}
@@ -291,7 +291,7 @@
   #dueBadge{font-size:12.5px;font-weight:700;color:#b5502a}
   .face .zh.zq{font-size:30px;line-height:1.4;margin-top:8px}
   .xsheet{position:fixed;inset:0;background:#f3eede;z-index:120;transform:translateY(102%);transition:transform .34s cubic-bezier(.32,.72,.24,1);display:flex;flex-direction:column}
-  body.popen #planSheet,body.sopen #statSheet{transform:translateY(0)}
+  body.topen #taskSheet{transform:translateY(0)}
   .pset{padding:10px 18px;border-top:1px solid #e7dcbd;background:#f7f1de;font-size:14px;font-weight:600;color:#3e3018;display:flex;flex-direction:column;gap:9px}
   .pset input[type=number]{width:64px;padding:6px 8px;border:1.5px solid #d8cba6;border-radius:8px;font-size:15px;background:#fbf7ea}
   .pset label{margin-right:12px}
@@ -397,17 +397,48 @@
   .pcard .face.front,.pcard .face.back{visibility:visible;transition:visibility 0s linear 0s}
   .pcard.flipped .face.front{visibility:hidden;transition:visibility 0s linear .55s}
   .pcard:not(.flipped) .face.back{visibility:hidden;transition:visibility 0s linear .55s}
+  /* ===== v40：固定组联动 / 组尾按钮 / 任务清单 ===== */
+  .ic .dot2{position:absolute;top:6px;right:6px;width:9px;height:9px;border-radius:50%;background:#d03a2a;display:none}
+  .ic .dot2.on{display:block}
+  #groupEnd{position:absolute;inset:0;z-index:6;display:none;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:#dfe3e8;padding:20px;text-align:center}
+  #groupEnd.show{display:flex}
+  .ge-title{font-size:19px;font-weight:800;color:#241d10;letter-spacing:.06em}
+  .ge-sub{font-size:13px;color:#77643f;letter-spacing:.05em}
+  .ge-btns{display:flex;gap:44px;margin-top:12px}
+  .ge-btn{display:flex;flex-direction:column;align-items:center;gap:9px;cursor:pointer;color:#275181}
+  .ge-btn .circ{width:74px;height:74px;border-radius:50%;border:2px solid #275181;background:rgba(255,255,255,.65);display:flex;align-items:center;justify-content:center;transition:transform .08s}
+  .ge-btn:active .circ{transform:scale(.93)}
+  .ge-btn svg{width:32px;height:32px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  .ge-btn span{font-size:13px;font-weight:700;color:#3e3018;letter-spacing:.14em}
+  .ge-btn.off{opacity:.32;pointer-events:none}
+  .trow{display:flex;align-items:center;gap:10px;padding:15px 8px;border-bottom:1px solid #e7dcbd;cursor:pointer}
+  .trow .tn{flex:1;font-size:15.5px;font-weight:700;color:#17130d}
+  .trow .tc{font-size:12.5px;color:#b5502a;font-weight:700;white-space:nowrap}
+  .trow .tt{font-size:12px;color:#77643f;white-space:nowrap}
+  .trow .car{color:#77643f;font-size:20px}
+  #menuTask{display:flex;align-items:center;gap:8px;border:1.5px solid #275181;color:#275181;background:rgba(255,255,255,.55);border-radius:999px;padding:8px 18px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit}
+  #menuTask .dot2{width:9px;height:9px;border-radius:50%;background:#d03a2a;display:none}
+  #menuTask .dot2.on{display:block}
+  .mrow .mxibtn{flex:none;font-size:12px;font-weight:700;padding:6px 10px;border-radius:999px;border:1.5px solid #b5502a;color:#b5502a;background:transparent;cursor:pointer;position:relative;z-index:1}
+  .mrow .mxi{flex:none;font-size:10.5px;font-weight:800;color:#fff;background:#b5502a;border-radius:5px;padding:2px 6px;letter-spacing:.08em}
+  #taskSheet{z-index:140}
+  /* ===== v41：选组（组收纳进章节里） ===== */
+  .grow{display:flex;align-items:center;gap:10px;padding:11px 8px 11px 42px;font-size:14.5px;border-bottom:1px solid #f3ecd9;cursor:pointer;color:#3e3018}
+  .grow .gn{font-weight:700}
+  .grow .gr{color:#a08c62;font-size:12.5px}
+  .grow .gst{margin-left:auto;color:#b5502a;font-size:12px;font-weight:700;white-space:nowrap}
+  .grow.cur{color:#275181}
+  .deckrow .car{margin-left:4px;color:#77643f;font-size:20px;transition:transform .2s}
+  .deckrow .car.o{transform:rotate(90deg)}
 </style>
 </head>
 <body>
 <header>
   <div class="ic" id="backBtn"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></div>
   <div style="flex:1"></div>
-  <div class="ic xueonly" id="dirBtn"><svg viewBox="0 0 24 24"><path d="M7 4L3 8l4 4M3 8h14M17 20l4-4-4-4M21 16H7"/></svg></div>
-  <div class="ic xueonly" id="manageBtn"><svg viewBox="0 0 24 24"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></svg></div>
+  <div class="ic" id="dirBtn"><svg viewBox="0 0 24 24"><path d="M7 4L3 8l4 4M3 8h14M17 20l4-4-4-4M21 16H7"/></svg></div>
   <div class="ic xueonly" id="deckBtn"><svg viewBox="0 0 24 24"><rect x="8" y="7" width="12" height="14" rx="2"/><path d="M5 17V5a2 2 0 012-2h9"/></svg></div>
-  <div class="ic xonly" id="btnStat"><svg viewBox="0 0 24 24"><path d="M5 20V11M12 20V4M19 20v-6"/></svg><span id="dueBadge"></span></div>
-  <div class="ic xonly" id="btnPlan"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/></svg></div>
+  <div class="ic" id="taskBtn"><svg viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11"/><path d="M4 5l1 1 2-2M4 11l1 1 2-2M4 17l1 1 2-2"/></svg><span class="dot2" id="taskDot"></span></div>
 </header>
 <div id="subTxt" hidden></div>
 <div class="stage">
@@ -416,6 +447,14 @@
     <div class="stack" id="stack"></div>
   </div>
   <button id="autoBtn" aria-label="自动播放"><svg viewBox="0 0 24 24"><path d="M8 5l11 7-11 7z" fill="currentColor"/></svg></button>
+  <div id="groupEnd">
+    <div class="ge-title" id="geTitle"></div>
+    <div class="ge-sub" id="geSub"></div>
+    <div class="ge-btns">
+      <div class="ge-btn" id="geLoop"><div class="circ"><svg viewBox="0 0 24 24"><path d="M19.5 12a7.5 7.5 0 1 1-2.2-5.3"/><path d="M19.7 3.2v3.9h-3.9"/></svg></div><span id="geLoopT">再来一遍</span></div>
+      <div class="ge-btn" id="geNext"><div class="circ"><svg viewBox="0 0 24 24"><path d="M4 12h15M13 6l6 6-6 6"/></svg></div><span id="geNextT">下一组</span></div>
+    </div>
+  </div>
 </div>
 <div class="detail" id="detail"></div>
 <div id="toast"></div>
@@ -432,7 +471,7 @@ const AUDIO = {"e:abnormal": "data:audio/mpeg;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAA
 <script>
 
 /* 卡组全表（小样阶段只有核心词汇有卡，其余待补） */
-const DECK_GEO = { id:"deck_geo", name:"自然地理", book:"雅思词汇真经", css:"#275181", sub:"雅思词汇真经 · 自然地理（小样 · v39）", pal:["#275181", "#4198B4", "#AFDBE4", "#ABCCBB", "#E1741F", "#F0C24A", "#F2E3B9"], cards:[
+const DECK_GEO = { id:"deck_geo", name:"自然地理", book:"雅思词汇真经", css:"#275181", sub:"雅思词汇真经 · 自然地理（小样 · v41）", pal:["#275181", "#4198B4", "#AFDBE4", "#ABCCBB", "#E1741F", "#F0C24A", "#F2E3B9"], cards:[
     {"en": "magma", "pos": "n.", "ipa": "/ˈmægmə/", "zh": "岩浆", "src": "词汇真经 · 自然地理", "ex": "Some types of minerals are made when magma cools and solidifies.", "exZh": "有些类型的矿物是在岩浆冷却凝固的过程中形成的。", "note": "字根mag意为“揉，捏”，另外在希腊语中magma意为“浓厚的软膏”，后引申为岩浆，因其流动起来柔软如膏。"},
     {"en": "volcano", "pos": "n.", "ipa": "/vɑlˈkeɪnoʊ/", "zh": "火山", "src": "词汇真经 · 自然地理", "ex": "The volcano erupted and two small towns were buried under metres of hot ash,mud and bits of molten rock.", "exZh": "这次火山爆发将两座小镇掩埋于数米厚炽热的火山灰、泥浆和熔岩碎块之下。", "col": "an active/dormant/extinct volcano活/休眠/死火山sit on a volcano处境危险该词来自罗马神话中的火神武尔坎（Vulcan），他的妻子是鼎鼎大名的司爱情与美丽的女神维纳斯（Venus）。后来维纳斯爱上了战神帅哥，红杏出墙，还生下了私生子丘比特（Cupid）！武尔坎招惹不起强大的情敌，只好躲在地底下打铁，胸中的怒火、妒火和炉火同时喷发，于是火星和浓烟从山顶喷出，形成火山（volcano）爆发。e", "memo": "erupt i onn.喷发，爆发erupt 230344 ===== PDF p.16 =====", "note": "Hotlavaeruptedfromthecrust.从地壳中喷发出了滚烫的熔岩。"},
     {"en": "crust", "pos": "n.", "ipa": "/krəst/", "zh": "地壳；外壳", "src": "词汇真经 · 自然地理", "ex": "The crust on the snow was thick enough for us to walk on it.", "exZh": "雪上冻结的那层冰很厚，足以让我们在上面行走。"},
@@ -666,7 +705,7 @@ const DECK_GEO = { id:"deck_geo", name:"自然地理", book:"雅思词汇真经"
     {"en": "petroleum", "pos": "n.", "ipa": "/pəˈtroʊliəm/", "zh": "石油", "src": "词汇真经 · 自然地理", "ex": "Petroleum is an important natural resource.", "exZh": "石油是一种重要的自然资源。", "note": "字根petr指“石头”，如：petrology（岩石学）。记得surprise，amaze，astonish，astound这些表示“使惊奇”的词吗？要表达最高程度的“惊奇”，就用petrify（v.[使]石化；使吓呆）。Chapter1自然地理84930344=====PDFp.31=====小红书小红书号：42284930344=====PDFp.32=====Letlifebebeautifullikesummerflowersanddeathlikeautumnleaves.—RabindranathTagore使生如夏花之绚烂，死如秋叶之静美。一泰戈尔"},
     {"en": "trunk", "pos": "n.", "ipa": "/trəŋk/", "zh": "树干", "src": "词汇真经 · 自然地理", "note": "Chapter"}
   ] };
-const DECK_PLANT = { id:"deck_plant", name:"植物研究", book:"雅思词汇真经", css:"#5A6E5D", sub:"雅思词汇真经 · 植物研究（小样 · v39）", pal:["#5A6E5D", "#A19245", "#F2D057", "#F5EB9A", "#ECA056", "#98BDD3", "#E3E5DE"], cards:[
+const DECK_PLANT = { id:"deck_plant", name:"植物研究", book:"雅思词汇真经", css:"#5A6E5D", sub:"雅思词汇真经 · 植物研究（小样 · v41）", pal:["#5A6E5D", "#A19245", "#F2D057", "#F5EB9A", "#ECA056", "#98BDD3", "#E3E5DE"], cards:[
     {"en": "jungle", "pos": "n.", "ipa": "/ˈʤəŋgəl/", "zh": "（热带）丛林，密林", "src": "词汇真经 · 植物研究", "ex": "Tigers are found in the jungle of Asia.", "exZh": "在亚洲的丛林中有老虎。", "col": "in the jungle在丛林里"},
     {"en": "weed", "pos": "n.", "ipa": "/wid/", "zh": "杂草，野草v.除杂草", "src": "词汇真经 · 植物研究", "ex": "The garden is choked with weeds.", "exZh": "花园里杂草丛生。", "note": "===== PDF p.33 ====="},
     {"en": "photosynthesis", "pos": "n.", "ipa": "/ˌfoʊtoʊˈsɪnθəsɪs/", "zh": "光合作用", "src": "词汇真经 · 植物研究", "ex": "The algae capture the sun's energy by photosynthesis and store it inorganic molecules.", "exZh": "水藻通过光合作用获得太阳的能量，将它储存在有机分子中。", "memo": "photo（光）+synthesis（合成）→用光合成→光合作用。又如photograph（照片）：photo（光）+ graph（写．画）→用光来描绘。/rr'spais/ respire V.呼吸respiration n.呼吸respiratory adj.呼吸的", "note": "前缀photo表示“光（light）”，故该单词的结构是：Plantsrespireinthesamewayasanimals,takinginoxygenandgivingoutcarbondioxide.植物和动物的呼吸方式相同，即摄入氧气并释放二氧化碳。"},
@@ -798,99 +837,8 @@ function paintEdges(){
   });
 }
 
-/* ---------- v21：批量管理 ---------- */
-let mSel = new Set(), mQuery = "";
-let mPending = {}, mExpanded = new Set();
-const effEnabled = c => (c.en in mPending) ? mPending[c.en] : (c.enabled !== false);
-function openManage(){
-  mSel = new Set(); mQuery = ""; $("mSearch").value = "";
-  mPending = {}; mExpanded = new Set();
-  $("mDeckName").textContent = DECK_META[activeKey].name;
-  renderManage();
-  document.body.classList.add("mopen"); histPush('manage');
-}
-function doCloseManage(){
-  document.body.classList.remove("mopen");
-  if (topIdx >= cards().length) topIdx = Math.max(0, cards().length - 1);
-  buildStack();
-}
-function mrowHTML(c){
-  const off = !effEnabled(c);
-  return '<label class="mrow' + (off ? ' off' : '') + '"><input type="checkbox" data-en="' + c.en + '"' + (mSel.has(c.en) ? ' checked' : '') + '>' +
-    '<span class="men">' + c.en + '</span><span class="mpos">' + c.pos + '</span><span class="mzh">' + c.zh + '</span>' +
-    '<span class="mtog' + (off ? ' off' : '') + '" data-en="' + c.en + '">' + (off ? '隐藏' : '表示') + '</span></label>';
-}
-function renderManage(){
-  const list = store[activeKey].filter(c => !mQuery || c.en.toLowerCase().includes(mQuery) || c.zh.includes(mQuery));
-  let html = '';
-  if (!list.length) html = '<div class="empty-note">没有匹配的单词</div>';
-  else if (mQuery) html = list.map(mrowHTML).join('');
-  else {
-    for (let g = 0; g < list.length; g += 10) {
-      const grp = list.slice(g, g + 10);
-      const gi = g / 10;
-      const on = grp.filter(c => effEnabled(c)).length;
-      const selAll = grp.every(c => mSel.has(c.en));
-      html += '<div class="mgroup"><input type="checkbox" class="mgrp" data-g="' + gi + '"' + (selAll ? ' checked' : '') + '>' +
-        '<span class="mgtitle" data-g="' + gi + '">第 ' + (gi + 1) + ' 组 · ' + (g + 1) + '–' + (g + grp.length) + '</span>' +
-        '<span class="mgcount">表示 ' + on + '/' + grp.length + '</span>' +
-        '<span class="mgfold" data-g="' + gi + '">' + (mExpanded.has(gi) ? '收起 ▾' : '展开 ▸') + '</span></div>';
-      if (mExpanded.has(gi)) html += grp.map(mrowHTML).join('');
-    }
-  }
-  $("mList").innerHTML = html;
-  document.querySelectorAll('#mList input[type=checkbox]:not(.mgrp)').forEach(cb => {
-    cb.onchange = () => { if (cb.checked) mSel.add(cb.dataset.en); else mSel.delete(cb.dataset.en); syncManageTools(list); };
-  });
-  document.querySelectorAll('#mList .mgrp').forEach(gb => {
-    const gi = +gb.dataset.g;
-    const grp = list.slice(gi * 10, gi * 10 + 10);
-    gb.indeterminate = grp.some(c => mSel.has(c.en)) && !grp.every(c => mSel.has(c.en));
-    gb.onchange = () => {
-      grp.forEach(c => { if (gb.checked) mSel.add(c.en); else mSel.delete(c.en); });
-      renderManage();
-    };
-  });
-  document.querySelectorAll('#mList .mgfold, #mList .mgtitle').forEach(el => {
-    el.addEventListener('click', () => {
-      const gi = +el.dataset.g;
-      if (mExpanded.has(gi)) mExpanded.delete(gi); else mExpanded.add(gi);
-      renderManage();
-    });
-  });
-  document.querySelectorAll('#mList .mtog').forEach(tg => {
-    tg.addEventListener('click', e => {
-      e.preventDefault(); e.stopPropagation();
-      const c = store[activeKey].find(x => x.en === tg.dataset.en);
-      if (!c) return;
-      mPending[c.en] = !effEnabled(c);
-      renderManage();
-    });
-  });
-  syncManageTools(list);
-}
-function applyPending(){
-  store[activeKey].forEach(c => { if (c.en in mPending) c.enabled = mPending[c.en]; });
-  mPending = {};
-  saveStore(); topIdx = 0; buildStack();
-}
-function syncManageTools(list){
-  list = list || store[activeKey].filter(c => !mQuery || c.en.toLowerCase().includes(mQuery) || c.zh.includes(mQuery));
-  $("mCount").textContent = "已选 " + mSel.size + " 个";
-  $("mAll").checked = list.length > 0 && list.every(c => mSel.has(c.en));
-}
+/* ---------- v41：批量管理已取消（隐藏状态一并作废，所有词恢复出现） ---------- */
 window.addEventListener("load", () => {
-$("mSearch").addEventListener("input", e => { mQuery = e.target.value.trim().toLowerCase(); renderManage(); });
-$("mAll").onchange = e => {
-  const list = store[activeKey].filter(c => !mQuery || c.en.toLowerCase().includes(mQuery) || c.zh.includes(mQuery));
-  list.forEach(c => { if (e.target.checked) mSel.add(c.en); else mSel.delete(c.en); });
-  renderManage();
-};
-$("mShow").onclick = () => { mSel.forEach(en => { mPending[en] = true; }); renderManage(); };
-$("mHide").onclick = () => { mSel.forEach(en => { mPending[en] = false; }); renderManage(); };
-$("manageBtn").onclick = openManage;
-$("mClose").onclick = () => { mPending = {}; closeManageUI(); };
-$("mDone").onclick = () => { applyPending(); closeManageUI(); };
 $("autoBtn").onclick = () => {
   autoOn = !autoOn;
   $("autoBtn").innerHTML = autoOn ? ICO_PAUSE : ICO_PLAY;
@@ -919,6 +867,7 @@ function shadowReset(){
   gsEl.style.opacity = 0.88;
 }
 let topIdx = 0, flipped = false, busy = false;
+let xueList = [], pendingCard = null;
 const K = 5;               /* 可见层数 */
 const SINK = 38;           /* 右滑返回时牌堆下沉量 */
 const POS = [
@@ -930,8 +879,8 @@ const POS = [
   { x: 50, y: 65, s: 0.925, z: 0 }
 ];
 const DECK_META = {
-  geo:   { name:"自然地理", css:"#275181", sub:"雅思词汇真经 · 自然地理（小样 · v39）", pal:["#275181","#4198B4","#AFDBE4","#ABCCBB","#E1741F","#F0C24A","#F2E3B9"] },
-  plant: { name:"植物研究", css:"#5A6E5D", sub:"雅思词汇真经 · 植物研究（小样 · v39）", pal:["#5A6E5D","#A19245","#F2D057","#F5EB9A","#ECA056","#98BDD3","#E3E5DE"] }
+  geo:   { name:"自然地理", css:"#275181", sub:"雅思词汇真经 · 自然地理（小样 · v41）", pal:["#275181","#4198B4","#AFDBE4","#ABCCBB","#E1741F","#F0C24A","#F2E3B9"] },
+  plant: { name:"植物研究", css:"#5A6E5D", sub:"雅思词汇真经 · 植物研究（小样 · v41）", pal:["#5A6E5D","#A19245","#F2D057","#F5EB9A","#ECA056","#98BDD3","#E3E5DE"] }
 };
 const LS_KEY = "ielts.zhenjing.v23";
 function seedStore(){ return { geo: DECK_GEO.cards.slice(), plant: DECK_PLANT.cards.slice() }; }
@@ -941,7 +890,7 @@ if (!store || !Array.isArray(store.geo) || !Array.isArray(store.plant)) { store 
 function saveStore(){ try { localStorage.setItem(LS_KEY, JSON.stringify(store)); } catch(e) {} }
 let activeKey = "geo";
 const ACTIVE = { get name(){ return DECK_META[activeKey].name; } };
-const cards = () => mode === "xi" ? studyQ : store[activeKey].filter(c => c.enabled !== false);
+const cards = () => mode === "xi" ? studyQ : xueList;
 const SPK = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9.2v5.6h3.8L12 19V5L6.8 9.2H3z" fill="currentColor"/><path d="M15.6 9.1a4.1 4.1 0 010 5.8M18 6.6a7.6 7.6 0 010 10.8" stroke="currentColor" fill="none" stroke-width="1.7" stroke-linecap="round"/></svg>';
 function speak(text){
   if (!text) return;
@@ -962,7 +911,7 @@ function autoPlayCard(){
   let i = 0;
   const step = () => {
     if (!autoOn) return;
-    if (i >= steps.length) { autoTimers.push(setTimeout(() => { if (autoOn) navNext(); }, 900)); return; }
+    if (i >= steps.length) { autoTimers.push(setTimeout(() => { if (autoOn) navNext(0, true); }, 900)); return; }
     const st = steps[i++];
     const tok = ++autoTok;
     if (st.clip) {
@@ -1000,14 +949,14 @@ function speakEx(card){ if (card && card.ex) playClip('e:' + card.en, card.ex); 
 const N = () => cards().length;
 function secLabel(n, t){ return '<div class="seclabel"><span class="n">' + n + '</span><span class="t">' + t + '</span><span class="ln"></span></div>'; }
 function faceHTML(card, num){
-  const v = card._v || (mode === "xi" ? "en2zh" : xueDir);
+  const v = card._v || xueDir;
   const c = cardColor(num - 1);
   /* v16：扔掉刊头/出处/组名等一切次要信息。正面纯英文、单词做绝对主体；背面英汉解析 */
   const corner = '<div class="corner"><span class="no2">Nº ' + num + '</span><i class="dot"></i></div>';
   const one = card.en.indexOf(" ") < 0 ? ' one' : '';
   /* v19：详情钮只放背面（看汉语示意时点）；背面关联词整段删除，不再溢出 */
   const footF = '<div class="foot fr"><span class="hint2">TAP TO FLIP</span></div>';
-  const footB = '<div class="foot fr"><span class="hint2">↑ 详情　·　↓ ' + (mode === "xi" ? "记住了" : "隐藏") + '</span></div>';
+  const footB = '<div class="foot fr"><span class="hint2">↑ 详情　·　↓ ' + (mode === "xi" ? "稍后再看" : "没记住") + '</span></div>';
   const front = corner +
     '<div class="mid hero"><div class="en hero' + one + '">' + card.en + '</div><div class="bar"></div>' +
     '<button class="spk" data-spk="1" aria-label="读音">' + SPK + '</button></div>' + footF;
@@ -1032,11 +981,14 @@ function openDetail(){
   if (card.memo) secs.push('<div class="dsec">' + secLabel('NN', '记 忆 法') + '<div class="dtext">' + card.memo + '</div></div>');
   if (card.note) secs.push('<div class="dsec">' + secLabel('NN', '拓 展') + '<div class="dtext">' + card.note + '</div></div>');
   h += secs.map((x, i) => x.replace('NN', '0' + (i + 1))).join('');
+  const xiKey = (typeof poolHas === 'function') ? (mode === "xi" ? card._k : activeKey + "|" + card.en) : null;
+  if (xiKey && poolHas(xiKey)) h += '<button class="speak" id="dXiOut" style="background:#b5502a">移出习 · 不再复习这个词</button>';
   h += '<div class="dsrc">出处：' + card.src + '</div></div>';
   $("detail").innerHTML = h;
   document.body.classList.add("dopen"); histPush('detail');
   $("dClose").onclick = () => closeDetailUI();
   $("dSpkW").onclick = () => speakWord(card.en);
+  const xo = $("dXiOut"); if (xo) xo.onclick = () => { poolDel(xiKey); if (typeof updateTaskDot === 'function') updateTaskDot(); closeDetailUI(); };
   const exBtn = $("dSpkEx"); if (exBtn) exBtn.onclick = () => speakEx(card);
 }
 function place(el, pos, animate, extraY){
@@ -1076,12 +1028,14 @@ function makeSlot(idx){
   return el;
 }
 function buildStack(){
+  hideGroupEnd();
   stackEl.innerHTML = ""; slots = [];
   if (!cards().length) {
-    stackEl.innerHTML = '<div class="empty-note">' + (mode === "xi" ? xiEmpty() : store[activeKey].length ? '这个卡组的卡片都被收起了<br>去「管理」里放出来' : '这个卡组还没有卡片') + '</div>';
+    stackEl.innerHTML = '<div class="empty-note">' + (mode === "xi" ? xiEmpty() : store[activeKey].length ? '这一组暂时没有卡片' : '这个卡组还没有卡片') + '</div>';
     flipped = false; renderSheet(); return;
   }
-  for(let k = 0; k < K; k++){
+  const KK = Math.min(K, N());
+  for(let k = 0; k < KK; k++){
     const idx = (topIdx + k) % N();
     const el = makeSlot(idx);
     stackEl.appendChild(el);
@@ -1104,19 +1058,50 @@ const CHAPTERS = [
   { key:null, name:"沙场争锋" }, { key:null, name:"社会角色" }, { key:null, name:"行为动作" },
   { key:null, name:"身心健康" }, { key:null, name:"时间日期" }
 ];
+let sheetOpenDeck = null;
+function groupStatus(deck, gi, grp){
+  const p = xueProg[deck];
+  const poolN = grp.filter(c => poolHas(deck + '|' + c.en)).length;
+  let t = '';
+  if(p && p.fin && p.fin[gi]) t = '已学完';
+  if(poolN) t = (t ? t + ' · ' : '') + '习 ' + poolN;
+  return t;
+}
 function renderSheet(){
+  if(sheetOpenDeck === null) sheetOpenDeck = activeKey;
   $("deckList").innerHTML = CHAPTERS.map((x, i) => {
     if (x.key) {
       const meta = DECK_META[x.key];
-      return '<div class="deckrow' + (activeKey === x.key ? ' cur' : ' pick') + '" data-key="' + x.key + '"><span class="sw" style="border-color:' + meta.css + '"></span>第' + (i + 1) + '章 · ' + x.name +
-        '<span class="cnt">' + store[x.key].length + ' 张</span></div>';
+      const open = sheetOpenDeck === x.key;
+      let h = '<div class="deckrow' + (activeKey === x.key ? ' cur' : '') + '" data-deck="' + x.key + '"><span class="sw" style="border-color:' + meta.css + '"></span>第' + (i + 1) + '章 · ' + x.name +
+        '<span class="cnt">' + store[x.key].length + ' 张</span><span class="car' + (open ? ' o' : '') + '">›</span></div>';
+      if (open) {
+        const gs = groupsOf(x.key), p = xueProg[x.key];
+        h += gs.map((grp, gi) => {
+          const st = groupStatus(x.key, gi, grp);
+          const cur = (x.key === activeKey && p && p.g === gi) ? ' cur' : '';
+          return '<div class="grow' + cur + '" data-gkey="' + x.key + '" data-g="' + gi + '"><span class="gn">第 ' + (gi + 1) + ' 组</span><span class="gr">' + (gi * 10 + 1) + '–' + (gi * 10 + grp.length) + '</span>' + (st ? '<span class="gst">' + st + '</span>' : '') + '</div>';
+        }).join('');
+      }
+      return h;
     }
     return '<div class="deckrow empty"><span class="sw" style="border-color:#c9bc9c"></span>第' + (i + 1) + '章 · ' + x.name + '<span class="cnt">待补</span></div>';
   }).join("");
-  document.querySelectorAll('#deckList .deckrow[data-key]').forEach(r => { r.onclick = () => switchDeck(r.dataset.key); });
+  document.querySelectorAll('#deckList .deckrow[data-deck]').forEach(r => { r.onclick = () => { sheetOpenDeck = (sheetOpenDeck === r.dataset.deck) ? '' : r.dataset.deck; renderSheet(); }; });
+  document.querySelectorAll('#deckList .grow').forEach(r => { r.onclick = () => selectGroup(r.dataset.gkey, +r.dataset.g); });
+}
+function selectGroup(key, gi){
+  const p = prog(key);
+  activeKey = key;
+  if (p.g !== gi) { p.g = gi; p.done = {}; }
+  topIdx = 0; flipped = false; uiEpoch++;
+  saveStudy();
+  $("subTxt").textContent = DECK_META[activeKey].sub;
+  buildXue();
+  closeSheetUI();
 }
 function switchDeck(key){
-  if (activeKey !== key) { activeKey = key; topIdx = 0; flipped = false; buildStack(); }
+  if (activeKey !== key) { activeKey = key; topIdx = 0; flipped = false; uiEpoch++; buildXue(); }
   $("subTxt").textContent = DECK_META[activeKey].sub;
   closeSheetUI();
 }
@@ -1200,50 +1185,38 @@ function completeNext(instant){
   flipped = false; busy = false;
   speakTop();
 }
-function navNext(v){
+function navNext(v, isAuto){
   if(busy) return; busy = true;
+  pendingCard = cards()[topIdx];
   const out = slots[0];
   const dur = Math.max(.2, Math.min(.3, .3 - Math.abs(v || 0) * .05));
   out.style.transition = "transform " + dur + "s cubic-bezier(.3,.6,.4,1), opacity " + dur + "s";
   out.style.transform = "translate(" + (-stackEl.clientWidth * 1.45) + "px,-14px) rotate(-13deg)";
   out.style.opacity = 0.25;
-  for(let k = 1; k < K; k++) place(slots[k], POS[k - 1], true);
-  scheduleFinish(completeNext, 290);
+  for(let k = 1; k < slots.length; k++) place(slots[k], POS[k - 1], true);
+  scheduleFinish(isAuto ? completeAuto : completeKnown, 290);
 }
-/* ---------- 下滑隐藏：与「管理」里的隐藏是同一个开关（c.enabled） ---------- */
+/* ---------- 下滑：学=没记住进习，习=放队尾稍后再看（完成回调在习题系统脚本里） ---------- */
 function buzz(){ try { navigator.vibrate && navigator.vibrate(8); } catch(e) {} }
-let toastTimer = null, lastHidden = null;
-function showToast(card){
-  lastHidden = card;
+let toastTimer = null, lastUndo = null, uiEpoch = 0;
+function showToast(msg, undoFn){
   const t = $("toast");
-  t.innerHTML = (mode === "xi" ? '已记住「' : '已隐藏「') + card.en + '」<span class="tundo" id="tUndo">撤销</span>';
+  lastUndo = undoFn ? { fn: undoFn, ep: uiEpoch } : null;
+  t.innerHTML = msg + (undoFn ? '<span class="tundo" id="tUndo">撤销</span>' : '');
   t.classList.add("show");
-  $("tUndo").onclick = undoHide;
+  if(undoFn) $("tUndo").onclick = () => { const u = lastUndo; lastUndo = null; t.classList.remove("show"); if(u && u.ep === uiEpoch) u.fn(); };
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => t.classList.remove("show"), 4200);
 }
-function undoHide(){
-  if(!lastHidden) return;
-  if(mode === "xi"){ lastHidden = null; $("toast").classList.remove("show"); undoAdv(lastSnap); return; }
-  lastHidden.enabled = true; saveStore();
-  topIdx = Math.max(0, cards().indexOf(lastHidden));
-  lastHidden = null; $("toast").classList.remove("show");
-  buildStack();
-}
 function hideTop(){
   if(busy || !N()) return; busy = true;
-  const card = cards()[topIdx];
+  pendingCard = cards()[topIdx];
   const out = slots[0];
   out.style.transition = "transform .3s cubic-bezier(.4,.1,.6,1), opacity .28s";
   out.style.transform = "translate(0px," + (stackEl.clientHeight * 0.55) + "px) scale(.9)";
   out.style.opacity = 0;
-  for(let k = 1; k < K; k++) place(slots[k], POS[k - 1], true);
-  scheduleFinish(() => {
-    if(mode === "xi"){ const w = wOf(card._k); lastSnap = { k: w.k, st: w.st, due: w.due, t0: w.t0, d: w.d }; advance(card._k); buildQ(); if(topIdx >= N()) topIdx = 0; } else { card.enabled = false; saveStore(); if(topIdx >= N()) topIdx = 0; }
-    busy = false;
-    buildStack();
-    showToast(card);
-  }, 300);
+  for(let k = 1; k < slots.length; k++) place(slots[k], POS[k - 1], true);
+  scheduleFinish(completeDown, 300);
 }
 /* 电脑上调试用的键盘：← → 切牌，↑ 详情，↓ 隐藏，空格翻面 */
 window.addEventListener("keydown", e => {
@@ -1298,7 +1271,11 @@ window.addEventListener("pointermove", e => {
   const dx = drag.dx;
   shadowDrag(dx);
   if(dx >= 0){
-    /* 右滑：手卡只平移不偏转；上一张从左侧不透明滑入；整堆下沉让位 */
+    /* v40：组内单向推进，右滑不再返回上一张，只给一点阻尼 */
+    slots[0].style.transform = "translate(" + dx * 0.22 + "px," + (drag.dy * 0.2) + "px) scale(1)";
+    return;
+  }
+  if(false){
     if(!cover && dx > 8) cover = makeCover();
     const p = Math.min(dx / 170, 1);
     slots.forEach((el, k) => {
@@ -1320,7 +1297,7 @@ window.addEventListener("pointermove", e => {
   /* 左滑：跟手 + 倾斜，下层逐层向上一位插值 */
   const p = Math.min(Math.abs(dx) / 130, 1);
   slots[0].style.transform = "translate(" + dx + "px," + (drag.dy * 0.32) + "px) rotate(" + (dx * 0.055) + "deg)";
-  for(let k = 1; k < K; k++){
+  for(let k = 1; k < slots.length; k++){
     const a = POS[k], b = POS[k - 1];
     const x = a.x + (b.x - a.x) * p, y = a.y + (b.y - a.y) * p, s = a.s + (b.s - a.s) * p;
     slots[k].style.transform = "translate(" + x + "px," + y + "px) scale(" + s + ")";
@@ -1387,7 +1364,7 @@ window.addEventListener("pointercancel", () => { if(drag){ drag = null; shadowRe
 })();
 
 /* ---------- 弹层与手机返回键：打开弹层时压一条历史，返回键先关弹层 ---------- */
-const histState = { detail: false, manage: false, sheet: false };
+const histState = { detail: false, manage: false, sheet: false, task: false };
 function histPush(k){ histState[k] = true; try { history.pushState({ zjOverlay: k }, ''); } catch(e) {} }
 function closeDetailUI(){ if (histState.detail) { history.back(); } else { document.body.classList.remove('dopen'); } }
 function closeSheetUI(){ if (histState.sheet) { history.back(); } else { document.body.classList.remove('open'); } }
@@ -1396,7 +1373,8 @@ window.addEventListener('popstate', () => {
   if (document.body.classList.contains('dopen')) { document.body.classList.remove('dopen'); histState.detail = false; return; }
   if (document.body.classList.contains('mopen')) { histState.manage = false; doCloseManage(); return; }
   if (document.body.classList.contains('open')) { document.body.classList.remove('open'); histState.sheet = false; return; }
-  histState.detail = histState.manage = histState.sheet = false;
+  if (document.body.classList.contains('topen')) { document.body.classList.remove('topen'); histState.task = false; return; }
+  histState.detail = histState.manage = histState.sheet = histState.task = false;
 });
 /* ---------- 选组页下拉关闭：抓顶部，或列表滚到顶后继续下拉 ---------- */
 (function(){
@@ -1440,183 +1418,265 @@ window.addEventListener('popstate', () => {
   list.addEventListener('touchend', () => { if (mode === 'list') finish(); else if (mode === 'pending') mode = null; });
   list.addEventListener('touchcancel', () => { if (mode === 'list' || mode === 'pending') { mode = null; snapBack(); } });
 })();
-$("deckBtn").onclick = () => { document.body.classList.add("open"); histPush('sheet'); };
+$("deckBtn").onclick = () => { sheetOpenDeck = activeKey; renderSheet(); document.body.classList.add("open"); histPush('sheet'); };
 $("mask").onclick = () => closeSheetUI();
 </script>
 <div id="menu" class="show">
-  <div class="mwrap"><div class="pcard" id="mcard"><div class="inner"><div class="thick"></div><div class="face front" style="--dc:#275181"><span class="paper"></span><div class="mttl"><span class="mg">学</span><span class="men">Study</span></div><div class="mcols"><div class="mcol"><b>浏览</b><u>全部单词卡</u></div><div class="mcol"><b>翻面</b><u>英汉互看</u></div><div class="mcol"><b>隐藏</b><u>下滑收起</u></div></div><div class="mfoot2">—— 学而时习之 ——</div></div><div class="face back" style="--dc:#E1741F"><span class="paper"></span><div class="mttl"><span class="mg">习</span><span class="men">Review</span></div><div class="mcols"><div class="mcol"><b>计划</b><u>逐词勾选</u></div><div class="mcol"><b>重复</b><u>遗忘曲线</u></div><div class="mcol"><b>记住</b><u>下滑过掉</u></div></div><div class="mfoot2">—— 学而时习之 ——</div></div></div></div></div>
+  <div class="mwrap"><div class="pcard" id="mcard"><div class="inner"><div class="thick"></div><div class="face front" style="--dc:#275181"><span class="paper"></span><div class="mttl"><span class="mg">学</span><span class="men">Study</span></div><div class="mcols"><div class="mcol"><b>分拣</b><u>一组十词</u></div><div class="mcol"><b>翻面</b><u>英汉互看</u></div><div class="mcol"><b>没记住</b><u>下滑进习</u></div></div><div class="mfoot2">—— 学而时习之 ——</div></div><div class="face back" style="--dc:#E1741F"><span class="paper"></span><div class="mttl"><span class="mg">习</span><span class="men">Review</span></div><div class="mcols"><div class="mcol"><b>联动</b><u>来自学</u></div><div class="mcol"><b>重复</b><u>遗忘曲线</u></div><div class="mcol"><b>延后</b><u>下滑稍后</u></div></div><div class="mfoot2">—— 学而时习之 ——</div></div></div></div></div>
   <div class="mhint">轻点翻面　·　左右滑动进入</div>
+  <button id="menuTask">任务清单<span class="dot2" id="menuTaskDot"></span></button>
 </div>
-<div class="xsheet" id="planSheet">
+<div class="xsheet" id="taskSheet">
   <div class="grabx"></div>
-  <div class="mhead"><div class="mtitle" id="pTitle"></div><div class="mx" id="pClose">×</div></div>
-  <div class="mlist pbody" id="pbody">
-    <div class="pstep" data-s="0"><div id="pList"></div></div>
-    <div class="pstep" data-s="1"><div class="stepper"><button id="pMinus">−</button><b id="pPerV">10</b><button id="pPlus">+</button></div><div class="pchips" id="pChips"></div><div class="pnote" id="pDays"></div></div>
-    <div class="pstep" data-s="2"><div class="opt" id="pM1">英 → 汉<small>正面英文，翻面英汉，自动读音</small></div><div class="opt" id="pM2">汉 → 英<small>正面汉语，翻面英汉，翻面后才读音</small></div><div class="pnote">两种都选时，每次复习轮流出现</div></div>
-  </div>
-  <div class="mfoot"><span class="mcount" id="pTotal"></span><span style="display:flex;gap:8px"><button class="mbtn ghost" id="pBack">上一步</button><button class="mbtn primary" id="pNext">下一步</button></span></div>
-</div>
-<div class="xsheet" id="statSheet">
-  <div class="grabx"></div>
-  <div class="mhead"><div class="mtitle">复习统计表</div><div class="mx" id="sClose">×</div></div>
-  <div class="mlist" id="sBody"></div>
-  <div class="mfoot"><button class="mbtn danger" id="sReset">结束计划</button><button class="mbtn primary" id="sDone">关闭</button></div>
-</div>
-<div class="msheet" id="manageSheet">
-  <div class="mhead"><div class="mtitle">批量管理 · <span id="mDeckName"></span></div><div class="mx" id="mClose">×</div></div>
-  <div class="msearch"><input id="mSearch" type="text" placeholder="搜索单词或中文…"></div>
-  <div class="mtools">
-    <div class="mtrow1"><label class="mall"><input type="checkbox" id="mAll"> 全选</label><span class="mcount" id="mCount">已选 0 个</span></div>
-    <div class="mtrow2"><button class="mbtn" id="mShow">批量表示</button><button class="mbtn" id="mHide">批量隐藏</button></div>
-  </div>
-  <div class="mlist" id="mList"></div>
-  <div class="mfoot"><button class="mbtn primary" id="mDone">完成</button></div>
+  <div class="mhead"><div class="mtitle">任务清单</div><div class="mx" id="tClose">×</div></div>
+  <div class="mlist" id="tBody"></div>
+  <div class="mfoot"><button class="mbtn primary" id="tDone">关闭</button></div>
 </div>
 
 <script>
-const INT = [5,30,60,720,1440,2880,5760,10080,21600,43200].map(m => m * 60000);   /* 5/30/60分钟 12小时 1/2/4/7/15/30天 */
-const LBL = ["5分","30分","60分","12时","1天","2天","4天","7天","15天","30天"];
-const SK = "ielts.zhenjing.study.v1";
-let plan = null, mode = "xue", xueDir = "en2zh", studyQ = [];
-try { const s = JSON.parse(localStorage.getItem(SK) || "null"); if(s){ plan = s.plan || null; mode = s.mode || "xue"; xueDir = s.dir || "en2zh"; } } catch(e) {}
-function saveStudy(){ try { localStorage.setItem(SK, JSON.stringify({ plan, mode, dir: xueDir })); } catch(e) {} }
+/* ================= v40：学/习联动（固定组 + 学分拣 + 习艾宾浩斯） ================= */
+const INT = [5,30,60,720,1440,2880,5760,10080,21600,43200].map(m => m * 60000);   /* 5分/30分/60分/12时/1/2/4/7/15/30天 */
+const SK2 = "ielts.zhenjing.study.v2";
+let mode = "xue", xueDir = "en2zh", studyQ = [];
+let pool = {};        /* "deck|en" -> {st,t0,due}；st=0=刚加入立即到期；走完阶梯自动删除 */
+let xueProg = {};     /* deck -> {g, done:{en:"k"|"u"}} */
+try { const s = JSON.parse(localStorage.getItem(SK2) || "null"); if(s){ pool = s.pool || {}; xueProg = s.xue || {}; xueDir = s.dir || "en2zh"; mode = s.mode || "xue"; } } catch(e) {}
+function saveStudy(){ try { localStorage.setItem(SK2, JSON.stringify({ pool, xue: xueProg, dir: xueDir, mode })); } catch(e) {} }
+const finSt = w => w.st >= 11;
+function poolHas(k){ return !!pool[k]; }
+function poolDel(k){ delete pool[k]; saveStudy(); }
 const midnight = t => new Date(t).setHours(0,0,0,0);
-const fin = w => w.m || w.st >= 11;
-const curV = c => c && (c._v || (mode === "xi" ? "en2zh" : xueDir));
-function skipSpk(){ return curV(cards()[topIdx]) === "zh2en"; }
 function fmt(t){ const d = new Date(t), n = new Date(), hm = d.toTimeString().slice(0,5); return d.toDateString() === n.toDateString() ? hm : (d.getMonth()+1) + "/" + d.getDate() + " " + hm; }
+function fmtFull(t){ const d = new Date(t); return (d.getMonth()+1) + "月" + d.getDate() + "日 " + d.toTimeString().slice(0,5); }
+function skipSpk(){ const c = cards()[topIdx]; return !!c && (c._v || xueDir) === "zh2en"; }
+const ICO_PLAY = '<svg viewBox="0 0 24 24"><path d="M8 5l11 7-11 7z" fill="currentColor"/></svg>', ICO_PAUSE = '<svg viewBox="0 0 24 24"><path d="M8 5v14M16 5v14" stroke-width="3"/></svg>';
 
-/* ---- 队列：到期的复习 + 今天配额内的新词 ---- */
-function computeQ(){
-  if(!plan) return [];
-  const now = Date.now(), W = plan.words, map = {};
-  Object.keys(store).forEach(k => store[k].forEach(c => { map[k + "|" + c.en] = c; }));
-  const due = W.filter(w => !fin(w) && w.st >= 0 && w.due <= now).sort((a, b) => a.due - b.due);
-  const intro = W.filter(w => w.st >= 0 || w.m).length;
-  const dayIdx = Math.floor((midnight(now) - plan.startDay) / 864e5);
-  const allow = Math.max(0, plan.perDay * (dayIdx + 1) - intro);
-  const fresh = W.filter(w => w.st < 0 && !w.m).slice(0, allow);
-  return due.concat(fresh).map(w => {
-    const c = map[w.k]; if(!c) return null;
-    const v = plan.modes[Math.max(w.st, 0) % plan.modes.length];
-    return Object.assign({}, c, { _v: v, _k: w.k, _d: w.k.split("|")[0], _w: w });
-  }).filter(Boolean);
+const cardMap = {};
+Object.keys(store).forEach(k => store[k].forEach(c => { cardMap[k + "|" + c.en] = c; }));
+const groupsOf = k => { const L = store[k], g = []; for(let i = 0; i < L.length; i += 10) g.push(L.slice(i, i + 10)); return g; };
+
+/* ---------- 组尾背景按钮 ---------- */
+let geCfg = null;
+function showGroupEnd(cfg){
+  geCfg = cfg;
+  $("geTitle").textContent = cfg.title;
+  $("geSub").textContent = cfg.sub || "";
+  $("geLoopT").textContent = cfg.loopText || "再来一遍";
+  $("geNextT").textContent = cfg.nextText || "下一组";
+  $("geLoop").classList.toggle("off", !cfg.loop);
+  $("geNext").classList.toggle("off", !cfg.next);
+  $("groupEnd").classList.add("show");
 }
-function buildQ(){ studyQ = computeQ(); }
-const wOf = k => plan.words.find(w => w.k === k);
-function advance(k){            /* 看过一轮：进入下一个复习阶段；落后太多就直接跳到还没到期的阶段 */
-  const w = wOf(k); if(!w) return; const now = Date.now();
-  if(w.st < 0){ w.t0 = now; w.d = midnight(now); w.st = 1; } else w.st++;
+function hideGroupEnd(){ $("groupEnd").classList.remove("show"); }
+$("geLoop").onclick = () => { if(geCfg && geCfg.loop && geCfg.onLoop) geCfg.onLoop(); };
+$("geNext").onclick = () => { if(geCfg && geCfg.next && geCfg.onNext) geCfg.onNext(); };
+
+/* ---------- 学：固定组分拣（左滑=记住了，下滑=没记住进习） ---------- */
+function prog(deck){ if(!xueProg[deck]) xueProg[deck] = { g: 0, done: {} }; return xueProg[deck]; }
+function xueGroupWords(deck, g){ const gs = groupsOf(deck); if(g >= gs.length) return []; return gs[g].slice(); }
+function buildXue(){
+  hideGroupEnd();
+  const deck = activeKey, p = prog(deck), gs = groupsOf(deck);
+  while(p.g < gs.length && !xueGroupWords(deck, p.g).length){ p.g++; p.done = {}; }
+  if(p.g >= gs.length){
+    xueList = []; stackEl.innerHTML = ""; flipped = false;
+    showGroupEnd({ title: "这一章学完了", sub: DECK_META[deck].name + " · 可以换一章继续", loop: false, next: false });
+    renderSheet(); return;
+  }
+  const words = xueGroupWords(deck, p.g);
+  const remain = words.filter(c => !p.done[c.en]);
+  if(!remain.length){ xueList = []; stackEl.innerHTML = ""; flipped = false; showXueEnd(); renderSheet(); return; }
+  xueList = remain; topIdx = 0; flipped = false;
+  buildStack();
+}
+function showXueEnd(){
+  const deck = activeKey, gs = groupsOf(deck), p = prog(deck);
+  p.fin = p.fin || {}; if(!p.fin[p.g]){ p.fin[p.g] = true; saveStudy(); }
+  showGroupEnd({ title: "这一组学完了", sub: DECK_META[deck].name + " · 第 " + (p.g + 1) + " 组", loop: true, next: p.g + 1 < gs.length, loopText: "再学一遍",
+    onLoop: () => { p.done = {}; saveStudy(); uiEpoch++; buildXue(); },
+    onNext: () => { p.g++; p.done = {}; saveStudy(); uiEpoch++; buildXue(); } });
+}
+function afterXueDecision(){
+  const p = prog(activeKey), words = xueGroupWords(activeKey, p.g);
+  if(words.length && words.every(c => p.done[c.en])){ xueList = []; stackEl.innerHTML = ""; flipped = false; showXueEnd(); }
+  else buildStack();
+}
+
+/* ---------- 习：词源与学联动，艾宾浩斯推进 ---------- */
+let xi = null;   /* {deck, g, round:"srs"|"free", freeKeys:[...]} */
+function dueKeysOf(deck, g){
+  const now = Date.now(), gs = groupsOf(deck);
+  if(g >= gs.length) return [];
+  return gs[g].map(c => deck + "|" + c.en).filter(k => { const w = pool[k]; return w && !finSt(w) && (w.st === 0 || w.due <= now); });
+}
+function xiGroups(){
+  const out = [];
+  Object.keys(DECK_META).forEach(dk => { const gs = groupsOf(dk); for(let g = 0; g < gs.length; g++){ const ks = dueKeysOf(dk, g); if(ks.length) out.push({ deck: dk, g, keys: ks }); } });
+  return out;
+}
+function xiCard(k){ const c = cardMap[k]; return Object.assign({}, c, { _v: xueDir, _k: k, _d: k.split("|")[0] }); }
+function enterXi(deck, g){
+  hideGroupEnd();
+  const list = xiGroups();
+  let t = null;
+  if(deck !== undefined) t = list.find(x => x.deck === deck && x.g === g) || null;
+  else t = list[0] || null;
+  if(!t){ xi = null; studyQ = []; topIdx = 0; flipped = false; buildStack(); return; }
+  xi = { deck: t.deck, g: t.g, round: "srs", freeKeys: [] };
+  studyQ = t.keys.map(xiCard);
+  topIdx = 0; flipped = false;
+  buildStack();
+}
+function enterXiNext(){
+  const list = xiGroups();
+  if(!list.length){ xi = null; studyQ = []; topIdx = 0; flipped = false; buildStack(); return; }
+  const order = Object.keys(DECK_META);
+  const cur = order.indexOf(xi.deck) * 1000 + xi.g;
+  const nxt = list.find(x => order.indexOf(x.deck) * 1000 + x.g > cur) || list[0];
+  enterXi(nxt.deck, nxt.g);
+}
+function advancePool(k){
+  const w = pool[k]; if(!w) return;
+  const now = Date.now();
+  if(w.st === 0){ w.t0 = now; w.st = 1; } else w.st++;
   while(w.st - 1 < INT.length && w.t0 + INT[w.st - 1] <= now) w.st++;
-  w.due = w.st - 1 < INT.length ? w.t0 + INT[w.st - 1] : Infinity;
+  if(finSt(w)){ delete pool[k]; saveStudy(); return; }
+  w.due = w.t0 + INT[w.st - 1];
   saveStudy();
 }
-function master(k){ const w = wOf(k); if(w){ w.m = true; saveStudy(); buildQ(); } }
-let lastSnap = null;
-function undoAdv(sn){ const w = sn && wOf(sn.k); if(!w) return; Object.assign(w, sn); saveStudy(); buildQ(); topIdx = Math.max(0, studyQ.findIndex(c => c._k === sn.k)); buildStack(); updateBar(); }
-function xiEmpty(){
-  const left = plan.words.filter(w => !fin(w));
-  if(!left.length) return "🎉 这一组全部学完了<br>点「计划」开始新的";
-  const nx = Math.min(Infinity, ...left.filter(w => w.st >= 0).map(w => w.due));
-  return "今天的任务完成了 ✓<br>" + (isFinite(nx) ? "下一次复习　" + fmt(nx) : "明天继续学新词");
+function xiGroupEnd(){
+  stackEl.innerHTML = ""; flipped = false;
+  showGroupEnd({ title: "这一组复习完了", sub: DECK_META[xi.deck].name + " · 第 " + (xi.g + 1) + " 组", loop: true, next: xiGroups().length > 0, loopText: "再复习一遍",
+    onLoop: () => { xi.round = "free"; studyQ = xi.freeKeys.map(xiCard); topIdx = 0; uiEpoch++; hideGroupEnd(); buildStack(); },
+    onNext: () => { uiEpoch++; enterXiNext(); } });
 }
-function updateBar(n){ const k = n === undefined ? studyQ.length : n; $("dueBadge").textContent = k ? "待复习 " + k : ""; }
-function updateSub(){}
+function xiEmpty(){
+  const keys = Object.keys(pool);
+  if(!keys.length) return '还没有没记住的词<br>在「学」里遇到不会的词，向下滑就会收进这里';
+  const dues = keys.map(k => pool[k]).filter(w => !finSt(w)).map(w => w.st === 0 ? 0 : w.due);
+  if(!dues.length) return '还没有没记住的词<br>在「学」里遇到不会的词，向下滑就会收进这里';
+  const nx = Math.min.apply(null, dues);
+  if(nx <= Date.now()) return '正在准备复习…';
+  return '没有可复习的<br>下一次复习在 ' + fmtFull(nx);
+}
+
+/* ---------- 手势完成回调（左滑=通过，下滑=学:进习 / 习:队尾） ---------- */
+function completeKnown(){
+  busy = false;
+  const card = pendingCard; pendingCard = null;
+  if(!card){ buildStack(); return; }
+  if(mode === "xue"){
+    const p = prog(activeKey);
+    p.done[card.en] = "k"; saveStudy(); uiEpoch++;
+    xueList.shift();
+    afterXueDecision();
+  } else if(xi){
+    if(xi.round === "srs"){
+      const k = card._k;
+      const snap = pool[k] ? { st: pool[k].st, t0: pool[k].t0, due: pool[k].due } : null;
+      advancePool(k);
+      xi.freeKeys.push(k);
+      studyQ.shift(); uiEpoch++;
+      showToast('已记住「' + card.en + '」', () => {
+        if(snap) pool[k] = snap; else delete pool[k];
+        saveStudy();
+        xi.freeKeys = xi.freeKeys.filter(x => x !== k);
+        studyQ.unshift(card); hideGroupEnd(); buildStack(); updateTaskDot();
+      });
+      if(!studyQ.length){ xiGroupEnd(); updateTaskDot(); return; }
+      buildStack();
+    } else {
+      studyQ.shift();
+      if(!studyQ.length){ xiGroupEnd(); return; }
+      buildStack();
+    }
+  }
+  updateTaskDot();
+}
+function completeAuto(){
+  busy = false; pendingCard = null;
+  if(xueList.length > 1) xueList.push(xueList.shift());
+  buildStack();
+}
+function completeDown(){
+  busy = false;
+  const card = pendingCard; pendingCard = null;
+  if(!card){ buildStack(); return; }
+  if(mode === "xue"){
+    const p = prog(activeKey), key = activeKey + "|" + card.en;
+    const wasIn = !!pool[key], prevDisp = p.done[card.en];
+    if(!wasIn) pool[key] = { st: 0, t0: 0, due: 0 };
+    p.done[card.en] = "u"; saveStudy(); uiEpoch++;
+    xueList.shift();
+    showToast(wasIn ? '「' + card.en + '」已在习里' : '没记住「' + card.en + '」· 已加入习', () => {
+      if(!wasIn) delete pool[key];
+      if(prevDisp) p.done[card.en] = prevDisp; else delete p.done[card.en];
+      saveStudy();
+      xueList.unshift(card); hideGroupEnd(); buildStack(); updateTaskDot();
+    });
+    afterXueDecision();
+    updateTaskDot();
+  } else if(xi){
+    studyQ.push(studyQ.shift());
+    buildStack();
+  }
+}
+
+/* ---------- 任务清单（通知栏：红点 + 点击直达该组） ---------- */
+function updateTaskDot(){
+  const on = xiGroups().length > 0;
+  $("taskDot").classList.toggle("on", on);
+  $("menuTaskDot").classList.toggle("on", on);
+}
+function renderTasks(){
+  const list = xiGroups();
+  let h = "";
+  if(!list.length){
+    h = '<div class="empty-note">暂时没有到期的复习</div>';
+    const dues = Object.keys(pool).map(k => pool[k]).filter(w => !finSt(w) && w.st > 0).map(w => w.due);
+    if(dues.length) h += '<div class="empty-note" style="padding-top:0">下一次复习在 ' + fmtFull(Math.min.apply(null, dues)) + '</div>';
+  } else {
+    h = list.map(x => {
+      const earliest = Math.min.apply(null, x.keys.map(k => pool[k].st === 0 ? Date.now() : pool[k].due));
+      return '<div class="trow" data-deck="' + x.deck + '" data-g="' + x.g + '"><span class="tn">' + DECK_META[x.deck].name + ' · 第 ' + (x.g + 1) + ' 组</span><span class="tc">' + x.keys.length + ' 词待复习</span><span class="tt">' + (earliest <= Date.now() ? '现在' : fmt(earliest)) + '</span><span class="car">›</span></div>';
+    }).join("");
+  }
+  $("tBody").innerHTML = h;
+  document.querySelectorAll('#tBody .trow').forEach(r => { r.onclick = () => { closeTaskUI(); jumpToGroup(r.dataset.deck, +r.dataset.g); }; });
+}
+function jumpToGroup(deck, g){
+  menu.classList.remove("show");
+  if(mode !== "xi"){ mode = "xi"; document.body.classList.add("xi"); }
+  if(autoOn) $("autoBtn").click();
+  uiEpoch++;
+  enterXi(deck, g);
+  saveStudy(); updateTaskDot();
+}
+function openTasks(){ renderTasks(); document.body.classList.add("topen"); histPush('task'); }
+function closeTaskUI(){ if(histState.task){ history.back(); } else { document.body.classList.remove("topen"); } }
+$("taskBtn").onclick = openTasks;
+$("menuTask").onclick = openTasks;
+$("tClose").onclick = () => closeTaskUI();
+$("tDone").onclick = () => closeTaskUI();
+
+/* ---------- 模式切换 ---------- */
+function refreshView(){ if(mode === "xue") buildXue(); else buildStack(); }
 function syncSeg(){ $("dirBtn").classList.toggle("rev", xueDir === "zh2en"); }
 function setMode(m, init){
-  if(m === "xi" && !plan){ if(init) m = "xue"; else { openPlan(); return; } }
   if(autoOn) $("autoBtn").click();
   mode = m; document.body.classList.toggle("xi", m === "xi");
-  if(m === "xi") buildQ();
-  topIdx = 0; flipped = false; busy = false;
-  syncSeg(); updateSub(); updateBar(); saveStudy(); buildStack();
+  topIdx = 0; flipped = false; busy = false; uiEpoch++;
+  if(m === "xi") enterXi(); else buildXue();
+  syncSeg(); saveStudy(); updateTaskDot();
 }
-$("dirBtn").onclick = () => { xueDir = xueDir === "en2zh" ? "zh2en" : "en2zh"; saveStudy(); syncSeg(); buildStack(); };
-
-/* ---- 计划：新建=分步；已有计划后再改=一页全显；勾选精确到每个单词 ---- */
-const ICO_PLAY = '<svg viewBox="0 0 24 24"><path d="M8 5l11 7-11 7z" fill="currentColor"/></svg>', ICO_PAUSE = '<svg viewBox="0 0 24 24"><path d="M8 5v14M16 5v14" stroke-width="3"/></svg>';
-const STEPT = ["选择内容", "每天学几个", "卡牌样式"];
-let pSel = new Set(), pTot = 0, pStep = 0, pPer = 10, pModes = new Set(["en2zh"]), pOpenD = new Set(), pOpenG = new Set();
-const groupsOf = k => { const L = store[k], g = []; for(let i = 0; i < L.length; i += 10) g.push(L.slice(i, i + 10)); return g; };
-const okW = g => g;   /* 习的计划自己管理：不看「学」里的隐藏状态，全部单词都可选 */
-const gKeys = (k, i) => okW(groupsOf(k)[i]).map(c => k + "|" + c.en);
-const dKeys = k => groupsOf(k).flatMap((_, i) => gKeys(k, i));
-const cnt = ks => ks.filter(x => pSel.has(x)).length;
-function openPlan(){
-  pSel = new Set(); pStep = 0; pOpenD = new Set(); pOpenG = new Set();
-  if(plan){ pPer = plan.perDay; pModes = new Set(plan.modes); plan.words.forEach(w => { if(!w.m) pSel.add(w.k); }); }
-  else { pPer = 10; pModes = new Set(["en2zh"]); }
-  renderPlan(); document.body.classList.add("popen");
-}
-const prow = (cls, fd, cb, n, t, name, open) => '<div ' + fd + ' class="prow ' + cls + '"><input type="checkbox" ' + cb + (n && n === t ? " checked" : "") + ' data-ind="' + (n && n < t ? 1 : 0) + '"><span class="pn">' + name + '</span><span class="pc">' + n + "/" + t + ' 词</span><span class="car' + (open ? " o" : "") + '">›</span></div>';
-function renderPlan(){
-  const all = !!plan;
-  document.querySelectorAll(".pstep").forEach(s => { s.style.display = (all || +s.dataset.s === pStep) ? "" : "none"; });
-  $("pTitle").textContent = all ? "学习计划" : "第 " + (pStep + 1) + " / 3 步 · " + STEPT[pStep];
-  $("pBack").style.display = (!all && pStep > 0) ? "" : "none";
-  $("pNext").textContent = all ? "保存" : pStep === 2 ? "开始学习" : "下一步";
-  pTot = pSel.size; let h = "";
-  Object.keys(DECK_META).forEach(k => {
-    const gs = groupsOf(k); if(!gs.length) return;
-    const dk = dKeys(k);
-    h += prow("pdh", 'data-fd="' + k + '"', 'data-d="' + k + '"', cnt(dk), dk.length, DECK_META[k].name, pOpenD.has(k));
-    if(pOpenD.has(k)) gs.forEach((g, i) => {
-      const id = k + ":" + i, gk = gKeys(k, i), og = pOpenG.has(id);
-      h += prow("pgh", 'data-fg="' + id + '"', 'data-g="' + id + '"', cnt(gk), gk.length, "第 " + (i + 1) + " 组", og);
-      if(og) h += '<div class="pws">' + okW(g).map(c => '<label class="pw"><input type="checkbox" data-w="' + k + "|" + c.en + '"' + (pSel.has(k + "|" + c.en) ? " checked" : "") + "><b>" + c.en + "</b><span>" + c.zh + "</span></label>").join("") + "</div>";
-    });
-  });
-  $("pList").innerHTML = h;
-  document.querySelectorAll('#pList input[data-ind="1"]').forEach(x => { x.indeterminate = true; });
-  $("pPerV").textContent = pPer;
-  $("pChips").innerHTML = [5, 10, 15, 20, 30].map(n => '<span data-n="' + n + '" class="' + (n === pPer ? "on" : "") + '">' + n + "</span>").join("");
-  $("pDays").textContent = pTot ? "共 " + pTot + " 词，约 " + Math.ceil(pTot / pPer) + " 天学完新词" : "";
-  $("pM1").classList.toggle("on", pModes.has("en2zh")); $("pM2").classList.toggle("on", pModes.has("zh2en"));
-  $("pTotal").textContent = "已选 " + pTot + " 个单词";
-}
-const tog = (s, x) => { if(s.has(x)) s.delete(x); else s.add(x); };
-$("pList").addEventListener("click", e => {
-  if(e.target.type === "checkbox" || e.target.closest(".pw")) return;
-  const fd = e.target.closest("[data-fd]"), fg = e.target.closest("[data-fg]");
-  if(fd) tog(pOpenD, fd.dataset.fd); else if(fg) tog(pOpenG, fg.dataset.fg); else return;
-  renderPlan();
-});
-$("pList").addEventListener("change", e => {
-  const t = e.target, set = (ks, on) => ks.forEach(x => on ? pSel.add(x) : pSel.delete(x));
-  if(t.dataset.d) set(dKeys(t.dataset.d), t.checked);
-  else if(t.dataset.g){ const p = t.dataset.g.split(":"); set(gKeys(p[0], +p[1]), t.checked); }
-  else if(t.dataset.w) set([t.dataset.w], t.checked);
-  renderPlan();
-});
-$("pMinus").onclick = () => { pPer = Math.max(1, pPer - 1); renderPlan(); };
-$("pPlus").onclick = () => { pPer = Math.min(200, pPer + 1); renderPlan(); };
-$("pChips").onclick = e => { if(e.target.dataset.n){ pPer = +e.target.dataset.n; renderPlan(); } };
-["pM1", "pM2"].forEach((id, i) => { $(id).onclick = () => { const m = i ? "zh2en" : "en2zh"; if(pModes.has(m)){ if(pModes.size > 1) pModes.delete(m); } else pModes.add(m); renderPlan(); }; });
-$("pBack").onclick = () => { pStep--; renderPlan(); };
-function closePlan(){ document.body.classList.remove("popen"); if(!plan) showMenu(); }
-$("pClose").onclick = closePlan;
-$("btnPlan").onclick = openPlan;
-$("pNext").onclick = () => {
-  if(!plan && pStep < 2){ if(pStep === 0 && !pSel.size) return alert("先勾选要学的单词"); pStep++; renderPlan(); return; }
-  if(!pSel.size) return alert("先勾选要学的单词");
-  const modes = ["en2zh", "zh2en"].filter(m => pModes.has(m));
-  if(plan){
-    /* 合并修改：保留已有进度；取消勾选=不再复习（算已掌握）；重新勾选=恢复；新勾的词作为新词加入 */
-    const have = new Set(plan.words.map(w => w.k));
-    plan.words.forEach(w => { w.m = !pSel.has(w.k); });
-    Object.keys(DECK_META).forEach(k => okW(store[k]).forEach(c => { const key = k + "|" + c.en; if(pSel.has(key) && !have.has(key)) plan.words.push({ k: key, st: -1, due: 0, t0: 0, d: 0, m: false }); }));
-    plan.perDay = pPer; plan.modes = modes;
-  } else {
-    const words = [];
-    Object.keys(DECK_META).forEach(k => okW(store[k]).forEach(c => { const key = k + "|" + c.en; if(pSel.has(key)) words.push({ k: key, st: -1, due: 0, t0: 0, d: 0, m: false }); }));
-    plan = { words, perDay: pPer, modes, startDay: midnight(Date.now()), created: Date.now() };
-  }
-  saveStudy(); document.body.classList.remove("popen");
-  mode = "xue"; setMode("xi");
+$("dirBtn").onclick = () => {
+  xueDir = xueDir === "en2zh" ? "zh2en" : "en2zh";
+  saveStudy(); syncSeg();
+  if(mode === "xi") studyQ = studyQ.map(c => Object.assign({}, c, { _v: xueDir }));
+  if(!$("groupEnd").classList.contains("show")) buildStack();
 };
 
-/* ---- 向下滑关闭（和详情页同一手感） ---- */
+/* ---------- 向下滑关闭（和详情页同一手感） ---------- */
 function dragClose(panel, bodyEl, cls, after){
   let st = null, sy = 0, dy = 0;
   panel.addEventListener("touchstart", e => { if(bodyEl.scrollTop <= 0){ st = "p"; sy = e.touches[0].clientY; dy = 0; } }, { passive: true });
@@ -1635,17 +1695,17 @@ function dragClose(panel, bodyEl, cls, after){
   };
   panel.addEventListener("touchend", end); panel.addEventListener("touchcancel", end);
 }
-dragClose($("planSheet"), $("pbody"), "popen", () => { if(!plan) showMenu(); });
-dragClose($("statSheet"), $("sBody"), "sopen");
+dragClose($("taskSheet"), $("tBody"), "topen");
 
-/* ---- 主菜单：一张卡，正面「学」背面「习」；轻点翻面，左右滑进入 ---- */
+/* ---------- 主菜单：一张卡，正面「学」背面「习」；轻点翻面，左右滑进入 ---------- */
 const menu = $("menu"), mcard = $("mcard");
 function showMenu(){
   if(autoOn) $("autoBtn").click();
   mcard.style.transition = "none"; mcard.style.transform = ""; mcard.style.opacity = 1;
   mcard.classList.toggle("flipped", mode === "xi"); menu.classList.add("show");
+  updateTaskDot();
 }
-function enter(m){ menu.classList.remove("show"); if(m === "xi" && !plan){ openPlan(); return; } if(m !== mode) setMode(m); }
+function enter(m){ menu.classList.remove("show"); if(m !== mode) setMode(m); else if(m === "xi") enterXi(); else buildXue(); }
 let md = null;
 mcard.addEventListener("pointerdown", e => { md = { x: e.clientX, y: e.clientY, dx: 0, v: 0, lx: e.clientX, lt: performance.now() }; mcard.style.transition = "none"; });
 window.addEventListener("pointermove", e => {
@@ -1668,36 +1728,12 @@ window.addEventListener("pointerup", () => {
 });
 $("backBtn").onclick = showMenu;
 
-/* ---- 统计表：行=学习日批次，列=各复习节点（红勾=该批全部完成，橙=已到期未完成，灰=预计时间） ---- */
-function renderStat(){
-  const W = plan.words, now = Date.now(), bm = {};
-  W.filter(w => w.st >= 0).forEach(w => (bm[w.d] = bm[w.d] || []).push(w));
-  let rows = "";
-  Object.keys(bm).sort((a, b) => a - b).forEach(d => {
-    const ws = bm[d], dt = new Date(+d);
-    rows += "<tr><td>" + (dt.getMonth() + 1) + "/" + dt.getDate() + "</td><td>" + ws.length + "</td>";
-    for(let s = 0; s < 10; s++){
-      let done = 0, due = Infinity;
-      ws.forEach(w => { if(w.m || w.st >= s + 2) done++; due = Math.min(due, w.t0 + INT[s]); });
-      rows += done === ws.length ? '<td class="ok">✓</td>' : due <= now ? '<td class="late">' + (done ? done + "/" + ws.length : "!") + "</td>" : '<td class="wait">' + fmt(due) + "</td>";
-    }
-    rows += "</tr>";
-  });
-  const dueN = computeQ().filter(c => c._w.st >= 0).length;
-  $("sBody").innerHTML = '<div class="xsum"><div><b>' + W.length + '</b>总词数</div><div><b>' + W.filter(fin).length + '</b>已学完</div><div><b>' + dueN + '</b>待复习</div><div><b>' + W.filter(w => w.st < 0 && !w.m).length + '</b>未开始</div></div>' +
-    (rows ? '<div class="twrap"><table class="xt"><thead><tr><th>日期</th><th>词数</th>' + LBL.map(x => "<th>" + x + "</th>").join("") + "</tr></thead><tbody>" + rows + "</tbody></table></div>" : '<div class="empty-note">还没开始学习<br>左滑一张卡就记下第一次学习</div>');
-}
-$("btnStat").onclick = () => { renderStat(); document.body.classList.add("sopen"); };
-$("sClose").onclick = $("sDone").onclick = () => document.body.classList.remove("sopen");
-$("sReset").onclick = () => { if(confirm("结束并清除当前学习计划？")){ plan = null; document.body.classList.remove("sopen"); setMode("xue"); } };
-
 setInterval(() => {
-  if(mode !== "xi" || !plan) return;
-  const q = computeQ(); updateBar(q.length);
-  if(!studyQ.length && q.length){ studyQ = q; topIdx = 0; buildStack(); }
+  updateTaskDot();
+  if(mode === "xi" && !xi && xiGroups().length) enterXi();
 }, 30000);
-setMode(mode === "xi" && plan ? "xi" : "xue", true);
+setMode(mode === "xi" ? "xi" : "xue", true);
 showMenu();
-</script>
+</script></script>
 </body>
 </html>
